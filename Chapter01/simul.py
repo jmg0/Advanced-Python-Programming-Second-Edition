@@ -18,33 +18,35 @@ class ParticleSimulator:
     def __init__(self, particles):
         self.particles = particles
 
-    def evolve(self, dt):
-        timestep = 0.00001
-        nsteps = int(dt / timestep)
-
-        for i in range(nsteps):
-            for p in self.particles:
-
-                norm = (p.x ** 2 + p.y ** 2) ** 0.5
-                v_x = (-p.y) / norm
-                v_y = p.x / norm
-
-                d_x = timestep * p.ang_speed * v_x
-                d_y = timestep * p.ang_speed * v_y
-
-                p.x += d_x
-                p.y += d_y
-
+    # @profile
     # def evolve(self, dt):
     #     timestep = 0.00001
-    #     nsteps = int(dt/timestep)
+    #     nsteps = int(dt / timestep)
+    #
+    #     for i in range(nsteps):
+    #         for p in self.particles:
+    #
+    #             norm = (p.x ** 2 + p.y ** 2) ** 0.5
+    #             v_x = (-p.y) / norm
+    #             v_y = p.x / norm
+    #
+    #             d_x = timestep * p.ang_speed * v_x
+    #             d_y = timestep * p.ang_speed * v_y
+    #
+    #             p.x += d_x
+    #             p.y += d_y
 
-    #     # First, change the loop order
-    #     for p in self.particles:
-    #         t_x_ang = timestep * p.ang_speed
-    #         for i in range(nsteps):
-    #             norm = (p.x**2 + p.y**2)**0.5
-    #             p.x, p.y = p.x - t_x_ang*p.y/norm, p.y + t_x_ang * p.x/norm
+    # @profile
+    def evolve(self, dt):
+        timestep = 0.00001
+        nsteps = int(dt/timestep)
+
+        # First, change the loop order
+        for p in self.particles:
+            t_x_ang = timestep * p.ang_speed
+            for i in range(nsteps):
+                norm = (p.x**2 + p.y**2)**0.5
+                p.x, p.y = p.x - t_x_ang*p.y/norm, p.y + t_x_ang * p.x/norm
 
 
 def visualize(simulator):
@@ -75,7 +77,7 @@ def visualize(simulator):
         return (line,)
 
     # Call the animate function each 10 ms
-    anim = animation.FuncAnimation(fig, animate, init_func=init, blit=True, interval=10)
+    anim = animation.FuncAnimation(fig, animate, init_func=init, blit=True, interval=10, cache_frame_data=False)
     plt.show()
 
 
@@ -116,6 +118,7 @@ def test_evolve():
     assert fequal(p2.y, -0.3652272210744360)
 
 
+# @profile
 def benchmark():
     particles = [
         Particle(uniform(-1.0, 1.0), uniform(-1.0, 1.0), uniform(-1.0, 1.0))
@@ -151,4 +154,7 @@ def benchmark_memory():
 
 
 if __name__ == "__main__":
-    benchmark()
+    # test_evolve()
+    # test_visualize()
+    benchmark_memory()
+    # benchmark()
